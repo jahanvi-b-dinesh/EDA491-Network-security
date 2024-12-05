@@ -1,0 +1,295 @@
+	Virtual IP: 10.0.2.2
+1. TCP Scan 
+We scan virtual IP on workstation - TCP SYN scan --> There's only 1 host up and 1 IP address, 2 TCP packets 
+ARP Ping scan /Parellel DNS resolution/SYN scan 
+3 open ports 135/445/3389 send 2000 packet receive 671
+Use ARP ping scan 
+ARP - 
+ICMP - 
+
+2. ACK Scan 
+Host is up 
+All 1000 scanned ports are in ignored state --> Only RST packets 
+1000 unfiltered TCP ports 
+
+3. FIN Scan : Same as above 
+1000 closed TCP ports 
+
+4. Null 
+1000 closed tcp ports 
+all 1000 scanned ports are in ignored states
+all flags are 0 
+
+5. Xscan 
+Same as aboe 
+but we get [FIN, PSH, URG]
+
+6. UDP: Much slower than TCP -- time taken - about 3 minutes
+We see ICMP and UDP protocols used in the list of packets 
+ARP -- Parallel DNS 
+increase send delay (0-50-100-200)
+open port 123 -- ntp
+open filtered - 67 , 137, 3389, 4500, 5050, 5355 -- ndhcps, netbios-ns, mmcc etc
+
+7.version scan - Gives OS information
+syn scan 3 open port 135/445/3389
+Launch NES scanning 
+135 msrpc windoews microsoft RPC 
+445 Microdoft-ds?
+3389 ms-wbt-server Microsoft Temrinal Services
+
+8. Fragmentation
+we scalled on port 135 because we know its open. 
+sent 3 --> Rx - 1 
+port state is now - filtered 
+Flag is set to 1 -- more fragments : set 
+
+what does --send-eth do? 
+135/tcp filtered msrpc
+
+
+PHYSICAL IP: 129.16.225.86
+
+1. TCP Scan
+Do ping scan (ICMP Ping) --> Paralell DNS --> SYN stealth scan
+We have an extra open port than before 
+139 is the new open port 
+sent : 2002 --- rx: 642
+
+One of the DNS has : Don't fragment set 
+
+
+2. ACK scan 
+1000 unfiltered TCP ports
+1000 ports are in ignored state  
+raw packets sent: 1004 --> RX: 1001 
+
+3. FIN scan [FIN]
+Same as above except: 1000 ports are in closed state
+
+4. Null [<none>]
+1000 closed tcp ports 
+all 1000 scanned ports are in ignored states
+all flags are 0 
+
+5. Xscan 
+same as above 
+but we have [FIN, PSH, URG]
+some flags are set to 1 
+
+6. UDP scan 
+ports open:123, 5353
+open filtered:  67 123, 137, 138, 3389, 4500, 5050, 5355
+nmap sends ACK and SYN to fogure out the version 
+They also send UDP and ICMP but we couldn't understand the package details 
+
+7. version scan - 
+open ports: 
+135
+139 Microsoft Windows netbios-ssn
+445
+3389
+
+8. Fragmentation - 
+We send 6 and rx 1 
+139 is the only port we check 
+it is filtered 
+More fragments flag is set as 1 --> IPv4 44 fragmnented IP protocol 
+
+--send-eth : send 6 --> rx: 1 
+
+-----------------------------------------------------------------------------------------------------------------------------
+SCANNING TARGET -- Firewall enabled 
+NMAP scan: everythign is open
+SYN Stealth Scan: everything is closed/ignored 
+
+
+
+1. TCP 
+ARP ping. paralell DNS, Use SYN scan 
+ports that are open:
+22 --> ssh 
+80 --> http 
+
+2. ACK 
+1000 unfiltered and ignored state
+not shown - 998 filtered TCP ports 
+22 --> unfiltered 
+80 --> unfiltered 
+
+3. FIN 
+a bit more slower 
+doesn't show any particular ports 
+1000 scanned ports are in ignored state 
+not shown: 1000 open/filtered tcp ports -- no response 
+
+4. Null 
+1000 open/filteres 
+
+1000 ignored closed 
+
+5. Xscan 
+same as above 
+but we have [FIN, PSH, URG]
+some flags are set to 1
+
+6. UDP 
+Does ARP and then DNS, UDP and ICMP
+we did with only port 22 : open filtered 
+
+7. Version Scan 
+22 - open ssh 
+80 - open http
+
+8. Fragmentation 
+-p 22 
+sent 516, rx: 6 
+
+--send-eth 
+sent 516 , rx: 8 
+
+
+----------------------------------------------------------------------------------------------------------------------------
+SCANNING TARGET - DISABLED FIREWALL 
+
+1. TCP 
+23 open ports 
+number of packets sent < rx packets 
+
+2. ACK 
+all in ignored and unfiltered state 
+
+3. FIN
+Same 23 ports are open but state is open filtered 
+
+4. NULL
+same as FIN 
+23 open filtered ports 
+
+5. XSCAN
+same as before 
+
+6. UDP 
+Port 22 closed state -- ssh 
+
+7. Version --> longer time
+23 ports are open 
+We hae many different protocols - PGSQL, TCP, HTTP, SMB, SSLv3,sip
+1 serice is unrecognised despite returning data 
+
+8. fragmentation
+23 open ports 
+2 hosts are up 
+raw packed sent - 2514  ---> rx : 2006 
+
+--send-eth 
+same thing 
+
+TCP fingerprinting - used to find configuration attributes of a device, type of OS, type of device the packet originated from etc. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+what is port scan
+why is it used 
+why 1024 - they're not scattered ports, but they still have many user applications
+what is sent on wireshark - we send SIN packets --> before and after TCP handshake 
+What do we learn from an xscan - to see if a port is running on a firewall --> and how the firewall is operating 
+can we learn from an xscan whether is state or stateless 
+When using stateless firewall, we accept all kinds of ack packets becaye we don't knwo if its valid or not. However, state4 knwos the server inside the firewall 
+ackscan isn't valid. so state4 firewall will block the ack. 
+What kinds of states are there in nmap and - open, close, filtered and unfiltered. 
+Open - 
+close - rst 
+ack
+filtered - doesn't correspond to naything
+unfiltered - accepts eveyr5hting but doesnt knwo anything about it.
+
+Difference between 5 types of packets 
+syn - to see if its open or not --> get synack in return 
+ack scan- get ack and if it is filtered, we get rst. if not, we will know 
+reset and null - 
+null -flag 0 bit 
+
+
+USE CASES of different - 
+syn pack - testing
+it its open, easy to exploit, if closed, avoid it
+ack - learn about server fireeall rules
+fin, null, xpass, - learn about OS of server, send rand combination of packets and 
+difference between TCP scan and UDP scan - TCP - if there is packet loss as there is timestamps, If we don;t get ack packet in that time, we can retransmit. In UDP - if we get the last packet, the UDP protocol won't know that is it the last packe, so it keeps waiting for last packer. So if we scan many ports, UDP takes a long time. UDP is connectionless and TCP is connection oriented. 
+Why is UDP so very slow - Lonux takes 1 second per scan 
+
+In port list, whats the difference between UDP and TCP scan 
+without firewall- more precise, with firewall - we can't distinguished - it shows the closed one also as open. Without firewall, iy can differentiate open and cloased 
+
+UDP vs TCP - UDP scan shows DNS and DHCP etc.
+TCP shows - TCP stuff 
+
+How does TCP fingerpringing work - combination of scans - Gives window size of server, how many hopes it has taken, OS of the server 
+
+why do we care about an OS - different OS behave differently. They maintain TCP stack differently, they use different commands, we can keep the commands, shells and kernels 
+
+why do we need fragmented scans - to check malwares that target our server 
+
+difference between - 
+
+some OS don't allow fragmented packets -   - this forces OS to force fragments 
+
+when using OS fingerprinting - can you identify which OS is runnign 
+
+did you scan physical address or virtual --
+
+what are the main takeaways from this lab - 
+
+
+
+
+
+eth 0 - local host 
+eth 1 - st
+
+ss, SA, Su, ss, sf 
+-p : port 
+-o : for OS -- tcp fingerprinting 
+
+-f : fragmentation 
+
+
+use 2 types of IP : Virtual and physical 
+virtual - found in manual :  
+physical ip - ip config in terminal - 129.16.225.86 / 192.168.56.1
+
+disable and enable firewall : given in lab PM 
+
+TCP scan : sudo nmap -ss (TCP syn packet) -v (verbose - to see processing) -p1-1024 *port number*
+
+nmap --help 
+
+
+
+
+Virtual IP: 
+workstation - 
+
+Physical IP:
+workstation -
+
+
+scanning target - with firewall 
+scanning target - without firewall 
+
+ 
+
+
+if 22 - has only 1 -- sevrer isn;t respodming  
